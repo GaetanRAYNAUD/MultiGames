@@ -63,5 +63,7 @@ public class MainView {
         return root;
     }
 
-    public void stop() {}
+    public void stop() {
+        this.sudokuView.stop();
+    }
 }

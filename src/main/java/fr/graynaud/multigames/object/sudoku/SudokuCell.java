@@ -220,7 +220,6 @@ public class SudokuCell extends StackPane {
         possibilitiesPane.getRowConstraints().add(rowConstraints);
         possibilitiesPane.getRowConstraints().add(rowConstraints);
         possibilitiesPane.getRowConstraints().add(rowConstraints);
-        //        possibilitiesPane.visibleProperty().bind(this.grid.showPossibilitiesProperty());
 
         possibilitiesPane.setOnMouseClicked(event -> {
             if (this.textField.isEditable()) {
@@ -313,6 +312,8 @@ public class SudokuCell extends StackPane {
     public void setHint(int value) {
         setValue(value);
         editableProperty().set(false);
+        this.possibilities.clear();
+        this.possibilities.add(value);
     }
 
     public void applyToEachContraint(Consumer<Set<SudokuCell>> consumer) {

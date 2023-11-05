@@ -2,6 +2,7 @@ package fr.graynaud.multigames.object.sudoku.solver;
 
 import com.google.common.collect.Sets;
 import fr.graynaud.multigames.object.sudoku.SudokuCell;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,41 +13,42 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class HiddenPairSolver extends SudokuSolver {
+public class HiddenQuadSolver extends SudokuSolver {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(HiddenPairSolver.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HiddenTripleSolver.class);
 
-    public static final HiddenPairSolver INSTANCE = new HiddenPairSolver();
+    public static final HiddenQuadSolver INSTANCE = new HiddenQuadSolver();
 
-    private HiddenPairSolver() {}
+    private HiddenQuadSolver() {}
 
     @Override
     public int solveInternal(SudokuCell cell) {
         if (cell.getPossibilities().size() > 2) {
-            Set<List<Integer>> cartesian = new HashSet<>(Sets.cartesianProduct(cell.getPossibilities(), cell.getPossibilities()));
+            Set<List<Integer>> cartesian = new HashSet<>(
+                    Sets.cartesianProduct(cell.getPossibilities(), cell.getPossibilities(), cell.getPossibilities(), cell.getPossibilities()));
             Iterator<List<Integer>> iterator = cartesian.iterator();
 
-            while (iterator.hasNext()) { //Remove duplicated (i.e., 4,6 and 6,4)
-                List<Integer> pair = iterator.next();
+            while (iterator.hasNext()) { //Remove duplicated (i.e., 4,6,7,8 and 8,7,6,4 and 6,8,7,4)
+                List<Integer> quad = iterator.next();
 
-                if (pair.get(0).equals(pair.get(1))) { //If duplicate number (i.e., 6,6 or 4,4) not wanted
+                if (quad.size() != new HashSet<>(quad).size()) { //If duplicate number (i.e., 6,6,4,8 or 8,6,6,6) not wanted
                     iterator.remove();
                     continue;
                 }
 
-                if (cartesian.contains(List.of(pair.get(1), pair.get(0)))) {
+                if (cartesian.stream().anyMatch(t -> !t.equals(quad) && CollectionUtils.isEqualCollection(quad, t))) {
                     iterator.remove();
                 }
             }
 
-            for (List<Integer> pair : cartesian) {
+            for (List<Integer> quad : cartesian) {
                 AtomicBoolean done = new AtomicBoolean(false);
                 cell.applyToEachContraint(cells -> {
                     if (done.get()) {
                         return;
                     }
                     Set<SudokuCell> parableCells = new HashSet<>();
-                    for (Integer possibility : pair) {
+                    for (Integer possibility : quad) {
                         for (SudokuCell otherCell : cells) {
                             if (otherCell.getValue() == null && otherCell.getPossibilities().contains(possibility)) {
                                 parableCells.add(otherCell);
@@ -54,25 +56,27 @@ public class HiddenPairSolver extends SudokuSolver {
                         }
                     }
 
-                    if (parableCells.size() == 1) {
+                    if (parableCells.size() == 3) {
                         AtomicBoolean anyChanged = new AtomicBoolean(false);
                         for (Integer possibility : new ArrayList<>(cell.getPossibilities())) {
-                            if (!pair.contains(possibility)) { //Keep only those 2 possibilities for the cells
+                            if (!quad.contains(possibility)) { //Keep only those 4 possibilities for the cells
                                 anyChanged.set(anyChanged.get() || cell.removePossibility(possibility));
-                                anyChanged.set(anyChanged.get() || parableCells.iterator().next().removePossibility(possibility));
+                                parableCells.forEach(c -> anyChanged.set(anyChanged.get() || c.removePossibility(possibility)));
                             }
                         }
 
                         for (SudokuCell otherCell : cells) {
-                            if (!parableCells.iterator().next().equals(otherCell)) {
-                                //Remove the pair from other cells
-                                pair.forEach(possibility -> anyChanged.set(anyChanged.get() || otherCell.removePossibility(possibility)));
+                            if (!parableCells.contains(otherCell)) {
+                                //Remove the quad from other cells
+                                quad.forEach(possibility -> anyChanged.set(anyChanged.get() || otherCell.removePossibility(possibility)));
                             }
                         }
 
                         if (anyChanged.get()) {
-                            LOGGER.info("Hidden pair {},{} at {},{}", cell.getPossibilities().iterator().next(), List.of(cell.getPossibilities()).get(1), cell,
-                                        parableCells.iterator().next());
+                            LOGGER.info("Hidden quad {},{},{},{} at {},{},{},{}", cell.getPossibilities().iterator().next(),
+                                        List.of(cell.getPossibilities()).get(1), List.of(cell.getPossibilities()).get(2),
+                                        List.of(cell.getPossibilities()).get(3), cell, parableCells.iterator().next(),
+                                        List.of(parableCells).get(2), List.of(parableCells).get(3));
                             done.set(true);
                         }
                     }

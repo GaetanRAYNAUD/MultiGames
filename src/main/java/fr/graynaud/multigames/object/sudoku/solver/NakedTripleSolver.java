@@ -2,6 +2,8 @@ package fr.graynaud.multigames.object.sudoku.solver;
 
 import com.google.common.collect.Sets;
 import fr.graynaud.multigames.object.sudoku.SudokuCell;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.List;
@@ -11,6 +13,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class NakedTripleSolver extends SudokuSolver {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(NakedTripleSolver.class);
 
     public static final NakedTripleSolver INSTANCE = new NakedTripleSolver();
 
@@ -27,8 +31,11 @@ public class NakedTripleSolver extends SudokuSolver {
                                                                       cell.getPossibilities().stream()).collect(Collectors.toSet());
 
                         if (allPossibilities.size() == 3) {
+                            LOGGER.info("Naked triple {},{},{} at {},{},{}", cell.getPossibilities().iterator().next(), List.of(cell.getPossibilities()).get(1),
+                                        List.of(cell.getPossibilities()).get(2), allPossibilities.iterator().next(), List.of(allPossibilities).get(1),
+                                        List.of(allPossibilities).get(2));
                             for (SudokuCell otherCell : cells) {
-                                if (!pair.contains(otherCell)) {
+                                if (otherCell.getValue() == null && !pair.contains(otherCell)) {
                                     for (Integer possibility : allPossibilities) {
                                         done.set(otherCell.removePossibility(possibility) || done.get());
                                     }

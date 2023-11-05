@@ -11,6 +11,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Random;
 import java.util.ResourceBundle;
@@ -79,6 +80,28 @@ public class SudokuGrid extends GridPane {
         for (SudokuCell[] row : this.grid) {
             for (SudokuCell cell : row) {
                 cell.postGridFilled();
+            }
+        }
+    }
+
+    public void generate(String seed) {
+        if (StringUtils.isBlank(seed) || StringUtils.length(seed) != 81 || !StringUtils.containsOnly(seed, ".0123456789")) {
+            return;
+        }
+
+        this.solved.set(false);
+
+        for (SudokuCell[] row : this.grid) {
+            for (SudokuCell cell : row) {
+                cell.reset();
+            }
+        }
+
+        for (int i = 0; i < seed.length(); i++) {
+            char c = seed.charAt(i);
+
+            if (c != '0' && c != '.') {
+                this.grid[i / GRID_SIZE][i % GRID_SIZE].setHint(c - '0');
             }
         }
     }

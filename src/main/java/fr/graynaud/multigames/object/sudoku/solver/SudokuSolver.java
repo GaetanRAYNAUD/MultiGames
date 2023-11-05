@@ -3,13 +3,18 @@ package fr.graynaud.multigames.object.sudoku.solver;
 import fr.graynaud.multigames.object.sudoku.SudokuCell;
 import fr.graynaud.multigames.object.sudoku.SudokuGrid;
 import org.apache.commons.collections4.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 public abstract class SudokuSolver {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(SudokuSolver.class);
+
     private static final List<SudokuSolver> SOLVERS = List.of(PinedSolver.INSTANCE, NakedPairSolver.INSTANCE, NakedTripleSolver.INSTANCE,
-                                                              HiddenPairSolver.INSTANCE, HiddenTripleSolver.INSTANCE, NakedQuadSolver.INSTANCE);
+                                                              HiddenPairSolver.INSTANCE, HiddenTripleSolver.INSTANCE, HiddenQuadSolver.INSTANCE,
+                                                              NakedQuadSolver.INSTANCE);
 
     public static void solve(SudokuGrid grid) {
         //Keep solving while is not solved or done anything
@@ -61,6 +66,7 @@ public abstract class SudokuSolver {
 
         if (solve && CollectionUtils.size(cell.getPossibilities()) == 1) {
             cell.setValue(cell.getPossibilities().iterator().next());
+            LOGGER.info("{} set to {}, because only possibility", cell, cell.getValue());
             return 2;
         }
 
@@ -68,6 +74,7 @@ public abstract class SudokuSolver {
 
         if (solve && CollectionUtils.size(cell.getPossibilities()) == 1) {
             cell.setValue(cell.getPossibilities().iterator().next());
+            LOGGER.info("{} set to {}, because only possibility", cell, cell.getValue());
             return 2;
         }
 

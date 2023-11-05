@@ -3,7 +3,6 @@ package fr.graynaud.multigames.view;
 import fr.graynaud.multigames.object.common.TimerLabel;
 import fr.graynaud.multigames.object.sudoku.SudokuGrid;
 import fr.graynaud.multigames.object.sudoku.solver.SudokuSolver;
-import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
@@ -17,6 +16,8 @@ import javafx.scene.text.Font;
 
 import java.util.Objects;
 import java.util.ResourceBundle;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class SudokuView implements GameView {
 
@@ -27,6 +28,8 @@ public class SudokuView implements GameView {
     private final TimerLabel timerLabel;
 
     private final BorderPane root;
+
+    private final ExecutorService solverExecutor = Executors.newSingleThreadExecutor();
 
     public SudokuView() {
         CheckBox filterPossibilitiesBox = new CheckBox(I18N.getString("filterPossibilities"));
@@ -59,21 +62,46 @@ public class SudokuView implements GameView {
 
         Button solveOneButton = new Button(I18N.getString("solveOne"));
         solveOneButton.setFont(Font.font(16));
-        solveOneButton.setOnAction(event -> Platform.runLater(() -> SudokuSolver.solveOne(this.grid)));
         solveOneButton.setStyle("-fx-text-fill: BLACK");
         solveOneButton.setMaxWidth(Double.MAX_VALUE);
 
         Button stepButton = new Button(I18N.getString("step"));
         stepButton.setFont(Font.font(16));
-        stepButton.setOnAction(event -> Platform.runLater(() -> SudokuSolver.step(this.grid, false)));
         stepButton.setStyle("-fx-text-fill: BLACK");
         stepButton.setMaxWidth(Double.MAX_VALUE);
 
         Button solveButton = new Button(I18N.getString("solve"));
         solveButton.setFont(Font.font(16));
-        solveButton.setOnAction(event -> Platform.runLater(() -> SudokuSolver.solve(this.grid)));
         solveButton.setStyle("-fx-text-fill: BLACK");
         solveButton.setMaxWidth(Double.MAX_VALUE);
+
+        solveOneButton.setOnAction(event -> this.solverExecutor.submit(() -> {
+            solveOneButton.disableProperty().set(true);
+            stepButton.disableProperty().set(true);
+            solveButton.disableProperty().set(true);
+            SudokuSolver.solveOne(this.grid);
+            solveOneButton.disableProperty().set(false);
+            stepButton.disableProperty().set(false);
+            solveButton.disableProperty().set(false);
+        }));
+        stepButton.setOnAction(event -> this.solverExecutor.submit(() -> {
+            solveOneButton.disableProperty().set(true);
+            stepButton.disableProperty().set(true);
+            solveButton.disableProperty().set(true);
+            SudokuSolver.step(this.grid, false);
+            solveOneButton.disableProperty().set(false);
+            stepButton.disableProperty().set(false);
+            solveButton.disableProperty().set(false);
+        }));
+        solveButton.setOnAction(event -> this.solverExecutor.submit(() -> {
+            solveOneButton.disableProperty().set(true);
+            stepButton.disableProperty().set(true);
+            solveButton.disableProperty().set(true);
+            SudokuSolver.solve(this.grid);
+            solveOneButton.disableProperty().set(false);
+            stepButton.disableProperty().set(false);
+            solveButton.disableProperty().set(false);
+        }));
 
         StackPane gridPane = new StackPane(this.grid);
         gridPane.minWidth(minWidth());
@@ -87,7 +115,7 @@ public class SudokuView implements GameView {
         VBox mainBox = new VBox(timerPane, gridPane);
         mainBox.setBackground(Background.fill(Color.WHITE));
 
-        VBox settings = new VBox(16, newGameButton, stepButton, solveButton, filterPossibilitiesBox, showErrorBox);
+        VBox settings = new VBox(16, newGameButton, stepButton, solveOneButton, solveButton, filterPossibilitiesBox, showErrorBox);
         settings.setPadding(new Insets(5, 10, 5, 10));
 
         this.root = new BorderPane(mainBox);
@@ -126,5 +154,6 @@ public class SudokuView implements GameView {
     @Override
     public void stop() {
         this.timerLabel.stop();
+        this.solverExecutor.shutdownNow();
     }
 }

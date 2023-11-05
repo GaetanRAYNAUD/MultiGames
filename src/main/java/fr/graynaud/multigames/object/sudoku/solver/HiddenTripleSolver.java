@@ -3,6 +3,8 @@ package fr.graynaud.multigames.object.sudoku.solver;
 import com.google.common.collect.Sets;
 import fr.graynaud.multigames.object.sudoku.SudokuCell;
 import org.apache.commons.collections4.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -12,6 +14,8 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class HiddenTripleSolver extends SudokuSolver {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(HiddenTripleSolver.class);
 
     public static final HiddenTripleSolver INSTANCE = new HiddenTripleSolver();
 
@@ -42,31 +46,37 @@ public class HiddenTripleSolver extends SudokuSolver {
                     if (done.get()) {
                         return;
                     }
-                    List<SudokuCell> parableCells = new ArrayList<>();
+                    Set<SudokuCell> parableCells = new HashSet<>();
                     for (Integer possibility : triple) {
                         for (SudokuCell otherCell : cells) {
                             if (otherCell.getValue() == null && otherCell.getPossibilities().contains(possibility)) {
                                 parableCells.add(otherCell);
-                            } else {
-                                parableCells.remove(otherCell);
                             }
                         }
                     }
 
                     if (parableCells.size() == 2) {
-/*                        for (Integer possibility : new ArrayList<>(cell.getPossibilities())) {
-                            if (!triple.contains(possibility)) { //Keep only those 2 possibilities for the cells
-                                cell.removePossibility(possibility);
-                                parableCells.get(0).removePossibility(possibility);
+                        AtomicBoolean anyChanged = new AtomicBoolean(false);
+                        for (Integer possibility : new ArrayList<>(cell.getPossibilities())) {
+                            if (!triple.contains(possibility)) { //Keep only those 3 possibilities for the cells
+                                anyChanged.set(anyChanged.get() || cell.removePossibility(possibility));
+                                parableCells.forEach(c -> anyChanged.set(anyChanged.get() || c.removePossibility(possibility)));
                             }
                         }
 
                         for (SudokuCell otherCell : cells) {
-                            if (!parableCells.get(0).equals(otherCell)) {
-                                triple.forEach(otherCell::removePossibility); //Remove the pair from other cells
+                            if (!parableCells.contains(otherCell)) {
+                                //Remove the triple from other cells
+                                triple.forEach(possibility -> anyChanged.set(anyChanged.get() || otherCell.removePossibility(possibility)));
                             }
-                        }*/
-                        done.set(true);
+                        }
+
+                        if (anyChanged.get()) {
+                            LOGGER.info("Hidden triple {},{},{} at {},{},{}", cell.getPossibilities().iterator().next(),
+                                        List.of(cell.getPossibilities()).get(1), List.of(cell.getPossibilities()).get(2), cell, parableCells.iterator().next(),
+                                        List.of(parableCells).get(2));
+                            done.set(true);
+                        }
                     }
                 });
 

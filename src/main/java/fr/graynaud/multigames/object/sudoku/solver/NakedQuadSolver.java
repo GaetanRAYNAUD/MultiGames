@@ -2,6 +2,8 @@ package fr.graynaud.multigames.object.sudoku.solver;
 
 import com.google.common.collect.Sets;
 import fr.graynaud.multigames.object.sudoku.SudokuCell;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.List;
@@ -11,6 +13,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class NakedQuadSolver extends SudokuSolver {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(NakedQuadSolver.class);
 
     public static final NakedQuadSolver INSTANCE = new NakedQuadSolver();
 
@@ -28,8 +32,12 @@ public class NakedQuadSolver extends SudokuSolver {
                                                                       cell.getPossibilities().stream()).collect(Collectors.toSet());
 
                         if (allPossibilities.size() == 4) {
+                            LOGGER.info("Naked quad {},{},{},{} at {},{},{},{}", cell.getPossibilities().iterator().next(),
+                                        List.of(cell.getPossibilities()).get(1),
+                                        List.of(cell.getPossibilities()).get(2), List.of(cell.getPossibilities()).get(3), allPossibilities.iterator().next(),
+                                        List.of(allPossibilities).get(1), List.of(allPossibilities).get(2), List.of(allPossibilities).get(3));
                             for (SudokuCell otherCell : cells) {
-                                if (!triple.contains(otherCell)) {
+                                if (otherCell.getValue() == null && !triple.contains(otherCell)) {
                                     for (Integer possibility : allPossibilities) {
                                         done.set(otherCell.removePossibility(possibility) || done.get());
                                     }
