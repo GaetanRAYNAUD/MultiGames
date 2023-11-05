@@ -1,0 +1,28 @@
+.text-field {
+    -fx-background-radius: 0;
+    -fx-highlight-text-fill: WHITE;
+    -fx-highlight-fill: BLUE;
+    -fx-font-weight: BOLD;
+    -fx-font-size: 28;
+    -fx-display-caret: false;
+}
+
+.text-field:disabled {
+    -fx-opacity: 1;
+    -fx-text-fill: BLUE;
+    -fx-font-weight: BOLD;
+    -fx-display-caret: false;
+}
+
+.text-field:readonly {
+    -fx-opacity: 1;
+    -fx-text-fill: BLUE;
+    -fx-font-weight: BOLD;
+    -fx-display-caret: false;
+}
+
+.text-field:error {
+    -fx-text-fill: RED;
+    -fx-highlight-fill: RED;
+    -fx-display-caret: false;
+}
