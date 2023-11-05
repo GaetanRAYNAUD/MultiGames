@@ -1,4 +1,4 @@
-package fr.osallek.view;
+package fr.graynaud.multigames.view;
 
 import javafx.scene.Parent;
 

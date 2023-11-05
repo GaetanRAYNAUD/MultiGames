@@ -1,7 +1,7 @@
-package fr.osallek.object.sudoku.solver;
+package fr.graynaud.multigames.object.sudoku.solver;
 
-import fr.osallek.object.sudoku.SudokuCell;
-import fr.osallek.object.sudoku.SudokuGrid;
+import fr.graynaud.multigames.object.sudoku.SudokuCell;
+import fr.graynaud.multigames.object.sudoku.SudokuGrid;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.List;

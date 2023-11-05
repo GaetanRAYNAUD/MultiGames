@@ -1,7 +1,7 @@
-package fr.osallek.object.sudoku;
+package fr.graynaud.multigames.object.sudoku;
 
-import fr.osallek.object.sudoku.solver.BasicSolver;
-import fr.osallek.object.sudoku.solver.SudokuSolver;
+import fr.graynaud.multigames.object.sudoku.solver.SudokuSolver;
+import fr.graynaud.multigames.object.sudoku.solver.BasicSolver;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;

@@ -1,12 +1,10 @@
-package fr.osallek.view;
+package fr.graynaud.multigames.view;
 
 import javafx.geometry.Pos;
-import javafx.scene.Parent;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.layout.Background;
-import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;

@@ -1,6 +1,6 @@
-package fr.osallek.object.sudoku.solver;
+package fr.graynaud.multigames.object.sudoku.solver;
 
-import fr.osallek.object.sudoku.SudokuCell;
+import fr.graynaud.multigames.object.sudoku.SudokuCell;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 

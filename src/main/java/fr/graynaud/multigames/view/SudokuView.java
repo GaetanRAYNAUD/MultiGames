@@ -1,17 +1,15 @@
-package fr.osallek.view;
+package fr.graynaud.multigames.view;
 
-import fr.osallek.object.common.TimerLabel;
-import fr.osallek.object.sudoku.SudokuGrid;
-import fr.osallek.object.sudoku.solver.SudokuSolver;
+import fr.graynaud.multigames.object.common.TimerLabel;
+import fr.graynaud.multigames.object.sudoku.SudokuGrid;
+import fr.graynaud.multigames.object.sudoku.solver.SudokuSolver;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.layout.Background;
-import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;

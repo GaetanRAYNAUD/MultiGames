@@ -1,7 +1,7 @@
-package fr.osallek.object.sudoku.solver;
+package fr.graynaud.multigames.object.sudoku.solver;
 
 import com.google.common.collect.Sets;
-import fr.osallek.object.sudoku.SudokuCell;
+import fr.graynaud.multigames.object.sudoku.SudokuCell;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;

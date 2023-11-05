@@ -4,8 +4,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>fr.osallek</groupId>
+  <groupId>fr.graynaud</groupId>
   <artifactId>multigames</artifactId>
+  <name>MultiGames</name>
   <version>1.0.0</version>
 
   <properties>
@@ -23,6 +24,9 @@
     <!-- Plugins versions -->
     <javafx.maven.plugin.version>0.0.8</javafx.maven.plugin.version>
     <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
+    <maven-assembly-plugin.version>3.6.0</maven-assembly-plugin.version>
+    <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
+    <maven-shade-plugin.version>3.5.1</maven-shade-plugin.version>
   </properties>
 
   <dependencies>
@@ -46,7 +50,6 @@
       <artifactId>guava</artifactId>
       <version>${guava.version}</version>
     </dependency>
-
   </dependencies>
 
   <build>
@@ -56,13 +59,25 @@
         <artifactId>javafx-maven-plugin</artifactId>
         <version>${javafx.maven.plugin.version}</version>
         <configuration>
-          <mainClass>fr.osallek.Main</mainClass>
+          <mainClass>fr.graynaud.multigames.MultiGames</mainClass>
+          <stripDebug>true</stripDebug>
+          <compress>2</compress>
+          <noHeaderFiles>true</noHeaderFiles>
+          <noManPages>true</noManPages>
+          <launcher>MultiGames</launcher>
+          <jlinkImageName>MultiGames</jlinkImageName>
+          <jlinkZipName>MultiGamesZip</jlinkZipName>
         </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>${maven.compiler.plugin.version}</version>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>${maven-resources-plugin.version}</version>
       </plugin>
     </plugins>
   </build>

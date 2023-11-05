@@ -1,9 +1,8 @@
-package fr.osallek.object.common;
+package fr.graynaud.multigames.object.common;
 
 import javafx.application.Platform;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.scene.control.Label;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 

@@ -1,4 +1,4 @@
-package fr.osallek.object.sudoku;
+package fr.graynaud.multigames.object.sudoku;
 
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -83,7 +83,7 @@ public class SudokuCell extends StackPane {
         this.textField.setMaxHeight(SudokuGrid.CELL_MIN_SIZE);
         this.textField.setAlignment(Pos.CENTER);
         setFocused(false);
-        getStylesheets().add(SudokuCell.class.getClassLoader().getResource("style/sudoku/style.css").toExternalForm());
+        getStylesheets().add(SudokuCell.class.getResource("/style/sudoku/style.css").toExternalForm());
         activeRow.addListener((observable, oldValue, newValue) -> {
             if (this.row == newValue.intValue() && this.col == activeCol.get()) {
                 this.textField.setStyle("-fx-background-color: #5a7bc0");
