@@ -13,6 +13,8 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
 import java.util.ResourceBundle;
@@ -22,6 +24,8 @@ import java.util.concurrent.Executors;
 public class SudokuView implements GameView {
 
     private static final ResourceBundle I18N = ResourceBundle.getBundle("i18n.sudoku");
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SudokuView.class);
 
     private final SudokuGrid grid;
 
@@ -79,7 +83,11 @@ public class SudokuView implements GameView {
             solveOneButton.disableProperty().set(true);
             stepButton.disableProperty().set(true);
             solveButton.disableProperty().set(true);
-            SudokuSolver.solveOne(this.grid);
+            try {
+                SudokuSolver.solveOne(this.grid);
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
+            }
             solveOneButton.disableProperty().set(false);
             stepButton.disableProperty().set(false);
             solveButton.disableProperty().set(false);
@@ -88,7 +96,11 @@ public class SudokuView implements GameView {
             solveOneButton.disableProperty().set(true);
             stepButton.disableProperty().set(true);
             solveButton.disableProperty().set(true);
-            SudokuSolver.step(this.grid, false);
+            try {
+                SudokuSolver.step(this.grid, false);
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
+            }
             solveOneButton.disableProperty().set(false);
             stepButton.disableProperty().set(false);
             solveButton.disableProperty().set(false);
@@ -97,7 +109,11 @@ public class SudokuView implements GameView {
             solveOneButton.disableProperty().set(true);
             stepButton.disableProperty().set(true);
             solveButton.disableProperty().set(true);
-            SudokuSolver.solve(this.grid);
+            try {
+                SudokuSolver.solve(this.grid);
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
+            }
             solveOneButton.disableProperty().set(false);
             stepButton.disableProperty().set(false);
             solveButton.disableProperty().set(false);
@@ -127,7 +143,8 @@ public class SudokuView implements GameView {
 
     @Override
     public Parent activate() {
-        newGame();
+//        newGame();
+        this.grid.generate("000000000904607000076804100309701080008000300050308702007502610000403208000000000");
 
         return this.root;
     }

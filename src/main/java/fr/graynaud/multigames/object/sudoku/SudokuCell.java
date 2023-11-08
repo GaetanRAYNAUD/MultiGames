@@ -114,34 +114,7 @@ public class SudokuCell extends StackPane {
         });
 
         this.value.addListener((observableValue, oldValue, newValue) -> {
-            if (this.resetting) {
-                this.textField.setText("");
-                return;
-            }
-
-            if (!editable) {
-                return;
-            }
-
-            if (newValue == null || newValue.intValue() == 0) {
-                this.textField.setText("");
-            } else {
-                if (newValue.intValue() < MIN_VALUE) {
-                    this.value.setValue(MIN_VALUE);
-                } else if (newValue.intValue() > MAX_VALUE) {
-                    this.value.setValue(MAX_VALUE);
-                } else {
-                    if (newValue.intValue() == 0 && StringUtils.isBlank(this.textField.textProperty().get())) {
-                        //nothing
-                    } else {
-                        this.textField.setText(newValue.toString());
-                    }
-                }
-            }
-
-            if (oldValue.intValue() != this.value.get()) {
-                this.grid.computeConstraints();
-            }
+            refreshText(oldValue, newValue);
         });
 
         this.textField.addEventFilter(KeyEvent.KEY_TYPED, event -> {
@@ -324,6 +297,41 @@ public class SudokuCell extends StackPane {
 
     public <T> Optional<T> functionToEachContraint(Function<Set<SudokuCell>, Optional<T>> function) {
         return function.apply(getColCells()).or(() -> function.apply(getRowCells())).or(() -> function.apply(getBoxCells()));
+    }
+
+    public void refreshText(Number oldValue, Number newValue) {
+        if (this.resetting) {
+            this.textField.setText("");
+            return;
+        }
+
+        if (!isEditable()) {
+            return;
+        }
+
+        if (this.grid.isSolving()) {
+            return;
+        }
+
+        if (newValue == null || newValue.intValue() == 0) {
+            this.textField.setText("");
+        } else {
+            if (newValue.intValue() < MIN_VALUE) {
+                this.value.setValue(MIN_VALUE);
+            } else if (newValue.intValue() > MAX_VALUE) {
+                this.value.setValue(MAX_VALUE);
+            } else {
+                if (newValue.intValue() == 0 && StringUtils.isBlank(this.textField.textProperty().get())) {
+                    //nothing
+                } else {
+                    this.textField.setText(newValue.toString());
+                }
+            }
+        }
+
+        if (!Objects.equals(oldValue, getValue())) {
+            this.grid.computeConstraints();
+        }
     }
 
     public Integer getValue() {

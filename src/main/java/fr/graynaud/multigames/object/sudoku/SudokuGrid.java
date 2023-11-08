@@ -11,8 +11,10 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Objects;
 import java.util.Random;
 import java.util.ResourceBundle;
 
@@ -38,6 +40,8 @@ public class SudokuGrid extends GridPane {
 
     private final BooleanProperty showError;
 
+    private BooleanProperty solving = new SimpleBooleanProperty(false);
+
     public SudokuGrid(BooleanProperty filterPossibilities, BooleanProperty showError) {
         this.filterPossibilities = filterPossibilities;
         this.showError = showError;
@@ -49,8 +53,16 @@ public class SudokuGrid extends GridPane {
         setMaxWidth(minWidth());
         prepare();
 
-        addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-            moveFocus(event.getCode(), 0);
+        addEventFilter(KeyEvent.KEY_PRESSED, event -> moveFocus(event.getCode(), 0));
+
+        this.solving.addListener((observable, oldValue, newValue) -> {
+            if (!Objects.equals(oldValue, newValue) && BooleanUtils.isFalse(newValue)) {
+                for (SudokuCell[] row : this.grid) {
+                    for (SudokuCell cell : row) {
+                        cell.refreshText(cell.getValue(), cell.getValue()); //Force rerender
+                    }
+                }
+            }
         });
     }
 
@@ -146,7 +158,7 @@ public class SudokuGrid extends GridPane {
     public void computeConstraints() {
         for (SudokuCell[] row : this.grid) {
             for (SudokuCell cell : row) {
-                SudokuSolver.solve(cell, BasicSolver.INSTANCE, true);
+                SudokuSolver.solve(cell, BasicSolver.INSTANCE, false);
             }
         }
 
@@ -227,5 +239,17 @@ public class SudokuGrid extends GridPane {
 
     public BooleanProperty showErrorProperty() {
         return showError;
+    }
+
+    public boolean isSolving() {
+        return solving.get();
+    }
+
+    public BooleanProperty solvingProperty() {
+        return solving;
+    }
+
+    public void setSolving(boolean solving) {
+        this.solving.set(solving);
     }
 }

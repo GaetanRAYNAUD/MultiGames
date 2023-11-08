@@ -59,22 +59,20 @@ public class HiddenTripleSolver extends SudokuSolver {
                         AtomicBoolean anyChanged = new AtomicBoolean(false);
                         for (Integer possibility : new ArrayList<>(cell.getPossibilities())) {
                             if (!triple.contains(possibility)) { //Keep only those 3 possibilities for the cells
-                                anyChanged.set(anyChanged.get() || cell.removePossibility(possibility));
-                                parableCells.forEach(c -> anyChanged.set(anyChanged.get() || c.removePossibility(possibility)));
+                                anyChanged.set(cell.removePossibility(possibility) || anyChanged.get());
+                                parableCells.forEach(c -> anyChanged.set(c.removePossibility(possibility) || anyChanged.get()));
                             }
                         }
 
                         for (SudokuCell otherCell : cells) {
                             if (!parableCells.contains(otherCell)) {
                                 //Remove the triple from other cells
-                                triple.forEach(possibility -> anyChanged.set(anyChanged.get() || otherCell.removePossibility(possibility)));
+                                triple.forEach(possibility -> anyChanged.set(otherCell.removePossibility(possibility) || anyChanged.get()));
                             }
                         }
 
                         if (anyChanged.get()) {
-                            LOGGER.info("Hidden triple {},{},{} at {},{},{}", cell.getPossibilities().iterator().next(),
-                                        List.of(cell.getPossibilities()).get(1), List.of(cell.getPossibilities()).get(2), cell, parableCells.iterator().next(),
-                                        List.of(parableCells).get(2));
+                            LOGGER.info("Hidden triple {} at {}", triple, List.of(cell, parableCells));
                             done.set(true);
                         }
                     }

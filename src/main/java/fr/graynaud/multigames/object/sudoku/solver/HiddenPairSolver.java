@@ -58,21 +58,20 @@ public class HiddenPairSolver extends SudokuSolver {
                         AtomicBoolean anyChanged = new AtomicBoolean(false);
                         for (Integer possibility : new ArrayList<>(cell.getPossibilities())) {
                             if (!pair.contains(possibility)) { //Keep only those 2 possibilities for the cells
-                                anyChanged.set(anyChanged.get() || cell.removePossibility(possibility));
-                                anyChanged.set(anyChanged.get() || parableCells.iterator().next().removePossibility(possibility));
+                                anyChanged.set(cell.removePossibility(possibility) || anyChanged.get());
+                                anyChanged.set(parableCells.iterator().next().removePossibility(possibility) || anyChanged.get());
                             }
                         }
 
                         for (SudokuCell otherCell : cells) {
                             if (!parableCells.iterator().next().equals(otherCell)) {
                                 //Remove the pair from other cells
-                                pair.forEach(possibility -> anyChanged.set(anyChanged.get() || otherCell.removePossibility(possibility)));
+                                pair.forEach(possibility -> anyChanged.set(otherCell.removePossibility(possibility) || anyChanged.get()));
                             }
                         }
 
                         if (anyChanged.get()) {
-                            LOGGER.info("Hidden pair {},{} at {},{}", cell.getPossibilities().iterator().next(), List.of(cell.getPossibilities()).get(1), cell,
-                                        parableCells.iterator().next());
+                            LOGGER.info("Hidden pair {} at {}", pair, List.of(cell, parableCells));
                             done.set(true);
                         }
                     }

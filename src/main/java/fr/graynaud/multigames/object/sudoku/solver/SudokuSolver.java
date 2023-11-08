@@ -19,8 +19,13 @@ public abstract class SudokuSolver {
     public static void solve(SudokuGrid grid) {
         //Keep solving while is not solved or done anything
         while (!grid.isSolved()) {
-            if (step(grid, true) == 0) {
-                return;
+            try {
+                grid.setSolving(true);
+                if (step(grid, true) == 0) {
+                    return;
+                }
+            } finally {
+                grid.setSolving(false);
             }
         }
     }
@@ -28,32 +33,43 @@ public abstract class SudokuSolver {
     public static void solveOne(SudokuGrid grid) {
         //Keep solving while is not solved or done anything or solved one cell
         while (!grid.isSolved()) {
-            int max = step(grid, true);
-            if (max == 0 || max == 2) {
-                return;
+            try {
+                grid.setSolving(true);
+                int max = step(grid, true);
+                if (max == 0 || max == 2) {
+                    return;
+                }
+            } finally {
+                grid.setSolving(false);
             }
         }
     }
 
     public static int step(SudokuGrid grid, boolean solve) {
-        for (SudokuSolver solver : SOLVERS) {
-            int max = 0;
-            for (SudokuCell[] row : grid.getGrid()) {
-                for (SudokuCell cell : row) {
-                    max = Math.max(max, solve(cell, solver, solve));
+        try {
+            grid.setSolving(true);
 
-                    if (!solve && max > 0) {
-                        return max;
+            for (SudokuSolver solver : SOLVERS) {
+                int max = 0;
+                for (SudokuCell[] row : grid.getGrid()) {
+                    for (SudokuCell cell : row) {
+                        max = Math.max(max, solve(cell, solver, solve));
+
+                        if (!solve && max > 0) {
+                            return max;
+                        }
                     }
+                }
+
+                if (max > 0) {
+                    return max;
                 }
             }
 
-            if (max > 0) {
-                return max;
-            }
+            return 0;
+        } finally {
+            grid.setSolving(false);
         }
-
-        return 0;
     }
 
     /**

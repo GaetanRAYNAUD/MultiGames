@@ -60,23 +60,20 @@ public class HiddenQuadSolver extends SudokuSolver {
                         AtomicBoolean anyChanged = new AtomicBoolean(false);
                         for (Integer possibility : new ArrayList<>(cell.getPossibilities())) {
                             if (!quad.contains(possibility)) { //Keep only those 4 possibilities for the cells
-                                anyChanged.set(anyChanged.get() || cell.removePossibility(possibility));
-                                parableCells.forEach(c -> anyChanged.set(anyChanged.get() || c.removePossibility(possibility)));
+                                anyChanged.set(cell.removePossibility(possibility) || anyChanged.get());
+                                parableCells.forEach(c -> anyChanged.set(c.removePossibility(possibility) || anyChanged.get()));
                             }
                         }
 
                         for (SudokuCell otherCell : cells) {
                             if (!parableCells.contains(otherCell)) {
                                 //Remove the quad from other cells
-                                quad.forEach(possibility -> anyChanged.set(anyChanged.get() || otherCell.removePossibility(possibility)));
+                                quad.forEach(possibility -> anyChanged.set(otherCell.removePossibility(possibility) || anyChanged.get()));
                             }
                         }
 
                         if (anyChanged.get()) {
-                            LOGGER.info("Hidden quad {},{},{},{} at {},{},{},{}", cell.getPossibilities().iterator().next(),
-                                        List.of(cell.getPossibilities()).get(1), List.of(cell.getPossibilities()).get(2),
-                                        List.of(cell.getPossibilities()).get(3), cell, parableCells.iterator().next(),
-                                        List.of(parableCells).get(2), List.of(parableCells).get(3));
+                            LOGGER.info("Hidden quad {} at {}", quad, List.of(cell, parableCells));
                             done.set(true);
                         }
                     }
