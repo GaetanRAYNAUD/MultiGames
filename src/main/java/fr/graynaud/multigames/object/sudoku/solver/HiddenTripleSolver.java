@@ -2,16 +2,16 @@ package fr.graynaud.multigames.object.sudoku.solver;
 
 import com.google.common.collect.Sets;
 import fr.graynaud.multigames.object.sudoku.SudokuCell;
-import org.apache.commons.collections4.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Stream;
+import org.apache.commons.collections4.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class HiddenTripleSolver extends SudokuSolver {
 
@@ -57,12 +57,13 @@ public class HiddenTripleSolver extends SudokuSolver {
 
                     if (parableCells.size() == 2) {
                         AtomicBoolean anyChanged = new AtomicBoolean(false);
-                        for (Integer possibility : new ArrayList<>(cell.getPossibilities())) {
-                            if (!triple.contains(possibility)) { //Keep only those 3 possibilities for the cells
-                                anyChanged.set(cell.removePossibility(possibility) || anyChanged.get());
-                                parableCells.forEach(c -> anyChanged.set(c.removePossibility(possibility) || anyChanged.get()));
-                            }
-                        }
+                        Stream.concat(cell.getPossibilities().stream(), parableCells.stream().map(SudokuCell::getPossibilities).flatMap(Collection::stream))
+                              .forEach(possibility -> {
+                                  if (!triple.contains(possibility)) { //Keep only those 3 possibilities for the cells
+                                      anyChanged.set(cell.removePossibility(possibility) || anyChanged.get());
+                                      parableCells.forEach(c -> anyChanged.set(c.removePossibility(possibility) || anyChanged.get()));
+                                  }
+                              });
 
                         for (SudokuCell otherCell : cells) {
                             if (!parableCells.contains(otherCell)) {

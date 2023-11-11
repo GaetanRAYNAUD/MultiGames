@@ -2,6 +2,8 @@ package fr.graynaud.multigames.object.sudoku.solver;
 
 import com.google.common.collect.Sets;
 import fr.graynaud.multigames.object.sudoku.SudokuCell;
+import java.util.Collection;
+import java.util.stream.Stream;
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,12 +60,14 @@ public class HiddenQuadSolver extends SudokuSolver {
 
                     if (parableCells.size() == 3) {
                         AtomicBoolean anyChanged = new AtomicBoolean(false);
-                        for (Integer possibility : new ArrayList<>(cell.getPossibilities())) {
-                            if (!quad.contains(possibility)) { //Keep only those 4 possibilities for the cells
-                                anyChanged.set(cell.removePossibility(possibility) || anyChanged.get());
-                                parableCells.forEach(c -> anyChanged.set(c.removePossibility(possibility) || anyChanged.get()));
-                            }
-                        }
+                        Stream.concat(cell.getPossibilities().stream(), parableCells.stream().map(SudokuCell::getPossibilities).flatMap(
+                                      Collection::stream))
+                              .forEach(possibility -> {
+                                  if (!quad.contains(possibility)) { //Keep only those 4 possibilities for the cells
+                                      anyChanged.set(cell.removePossibility(possibility) || anyChanged.get());
+                                      parableCells.forEach(c -> anyChanged.set(c.removePossibility(possibility) || anyChanged.get()));
+                                  }
+                              });
 
                         for (SudokuCell otherCell : cells) {
                             if (!parableCells.contains(otherCell)) {

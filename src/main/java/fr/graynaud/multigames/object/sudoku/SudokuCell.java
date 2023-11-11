@@ -1,5 +1,14 @@
 package fr.graynaud.multigames.object.sudoku;
 
+import com.google.common.collect.ImmutableSet;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
@@ -21,17 +30,12 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import org.apache.commons.lang3.StringUtils;
-
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Consumer;
-import java.util.function.Function;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SudokuCell extends StackPane {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SudokuCell.class);
 
     private static final PseudoClass ERROR = PseudoClass.getPseudoClass("error");
 
@@ -209,7 +213,7 @@ public class SudokuCell extends StackPane {
             Text text = new Text(b.toString());
             text.visibleProperty()
                 .bind(Bindings.createBooleanBinding(
-                        () -> (!this.grid.filterPossibilitiesProperty().get() || this.possibilities.size() > 1 && this.possibilities.contains(b))
+                        () -> (!this.grid.filterPossibilitiesProperty().get() || getValue() == null && this.possibilities.contains(b))
                               && getValue() == null,
                         this.possibilities, this.value, this.grid.filterPossibilitiesProperty()));
             text.setOnMouseClicked(event -> setValue(b));
@@ -363,11 +367,17 @@ public class SudokuCell extends StackPane {
     }
 
     public Set<Integer> getPossibilities() {
-        return possibilities;
+        return ImmutableSet.copyOf(this.possibilities);
     }
 
     public boolean removePossibility(Integer possibility) {
-        return this.possibilities.remove(possibility);
+        boolean removed = this.possibilities.remove(possibility);
+
+        if (removed) {
+            LOGGER.debug("Removed possibility {} for {}", possibility, this);
+        }
+
+        return removed;
     }
 
     public Set<SudokuCell> getConstrains() {

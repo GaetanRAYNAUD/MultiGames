@@ -1,7 +1,13 @@
 package fr.graynaud.multigames.object.sudoku;
 
-import fr.graynaud.multigames.object.sudoku.solver.SudokuSolver;
 import fr.graynaud.multigames.object.sudoku.solver.BasicSolver;
+import fr.graynaud.multigames.object.sudoku.solver.PinedSolver;
+import fr.graynaud.multigames.object.sudoku.solver.SudokuSolver;
+import java.util.LinkedHashSet;
+import java.util.Objects;
+import java.util.Random;
+import java.util.ResourceBundle;
+import java.util.Set;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -13,10 +19,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
-
-import java.util.Objects;
-import java.util.Random;
-import java.util.ResourceBundle;
 
 public class SudokuGrid extends GridPane {
 
@@ -57,6 +59,7 @@ public class SudokuGrid extends GridPane {
 
         this.solving.addListener((observable, oldValue, newValue) -> {
             if (!Objects.equals(oldValue, newValue) && BooleanUtils.isFalse(newValue)) {
+                computeConstraints();
                 for (SudokuCell[] row : this.grid) {
                     for (SudokuCell cell : row) {
                         cell.refreshText(cell.getValue(), cell.getValue()); //Force rerender
@@ -146,7 +149,7 @@ public class SudokuGrid extends GridPane {
 
         for (SudokuCell[] row : this.grid) {
             for (SudokuCell cell : row) {
-                if (cell.getValue() != null) {
+                if (cell.getValue() == null) {
                     return;
                 }
             }
@@ -158,7 +161,9 @@ public class SudokuGrid extends GridPane {
     public void computeConstraints() {
         for (SudokuCell[] row : this.grid) {
             for (SudokuCell cell : row) {
-                SudokuSolver.solve(cell, BasicSolver.INSTANCE, false);
+                if (cell.getValue() == null && cell.isEditable()) {
+                    SudokuSolver.solve(cell, BasicSolver.INSTANCE, false);
+                }
             }
         }
 
@@ -211,6 +216,19 @@ public class SudokuGrid extends GridPane {
 
     public SudokuCell getCell(int row, int col) {
         return this.grid[row][col];
+    }
+
+    public Set<SudokuCell> getRow(int row) {
+        return Set.of(this.grid[row]);
+    }
+    public Set<SudokuCell> getCol(int col) {
+        Set<SudokuCell> cells = new LinkedHashSet<>();
+
+        for (SudokuCell[] row : this.grid) {
+            cells.add(row[col]);
+        }
+
+        return cells;
     }
 
     public SudokuCell getActiveCell() {

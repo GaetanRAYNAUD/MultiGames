@@ -15,7 +15,6 @@ public class BasicSolver extends SudokuSolver {
         }
 
         boolean reduced = false;
-        cell.resetPossibilities();
         for (SudokuCell constrain : cell.getConstrains()) {
             if (!constrain.equals(cell) && constrain.getValue() != null) {
                 if (cell.removePossibility(constrain.getValue())) {

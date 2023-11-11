@@ -2,6 +2,8 @@ package fr.graynaud.multigames.object.sudoku.solver;
 
 import com.google.common.collect.Sets;
 import fr.graynaud.multigames.object.sudoku.SudokuCell;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.ListUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +58,7 @@ public class HiddenPairSolver extends SudokuSolver {
 
                     if (parableCells.size() == 1) {
                         AtomicBoolean anyChanged = new AtomicBoolean(false);
-                        for (Integer possibility : new ArrayList<>(cell.getPossibilities())) {
+                        for (Integer possibility : CollectionUtils.union(cell.getPossibilities(), parableCells.iterator().next().getPossibilities())) {
                             if (!pair.contains(possibility)) { //Keep only those 2 possibilities for the cells
                                 anyChanged.set(cell.removePossibility(possibility) || anyChanged.get());
                                 anyChanged.set(parableCells.iterator().next().removePossibility(possibility) || anyChanged.get());

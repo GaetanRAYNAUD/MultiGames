@@ -1,6 +1,7 @@
 package fr.graynaud.multigames.object.sudoku.solver;
 
 import fr.graynaud.multigames.object.sudoku.SudokuCell;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +19,14 @@ public class PinedSolver extends SudokuSolver {
 
     @Override
     public int solveInternal(SudokuCell cell) {
+        if (cell.getValue() != null) {
+            return 0;
+        } else if (CollectionUtils.size(cell.getPossibilities()) == 1) {
+            cell.setValue(cell.getPossibilities().iterator().next());
+            LOGGER.info("Pined {} for {}", cell.getValue(), cell);
+            return 2;
+        }
+
         for (Integer possibility : cell.getPossibilities()) {
             //Possibility is only available in this cell for this box/col/row = pinned
             if (cell.functionToEachContraint(cells -> {

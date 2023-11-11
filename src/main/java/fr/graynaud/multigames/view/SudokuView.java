@@ -143,14 +143,14 @@ public class SudokuView implements GameView {
 
     @Override
     public Parent activate() {
-//        newGame();
-        this.grid.generate("000000000904607000076804100309701080008000300050308702007502610000403208000000000");
+        newGame();
 
         return this.root;
     }
 
     private void newGame() {
-        this.grid.generate();
+//        this.grid.generate();
+        this.grid.generate("900240000050690231020050090090700320002935607070002900069020073510079062207086009");
         this.timerLabel.resetAndStart();
     }
 
